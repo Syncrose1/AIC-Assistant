@@ -52,22 +52,28 @@ echo ""
 # Step 3: Build packages (if needed)
 echo -e "${BLUE}[3/5]${NC} Checking packages build..."
 # Check if packages are built by looking for dist directories
+# Only check packages that have a "build" script in package.json
 PACKAGES_NEED_BUILD=0
-for pkg in animation-core emotion-visual lipsync-vbridger phoneme-timing; do
-    if [ ! -d "$PROJECT_DIR/packages/$pkg/dist" ] && [ -f "$PROJECT_DIR/packages/$pkg/package.json" ]; then
-        PACKAGES_NEED_BUILD=1
-        break
+for pkg in emotion-visual lipsync-vbridger phoneme-timing; do
+    if [ -f "$PROJECT_DIR/packages/$pkg/package.json" ]; then
+        # Check if package has a build script AND doesn't have dist
+        if grep -q '"build"' "$PROJECT_DIR/packages/$pkg/package.json" 2>/dev/null; then
+            if [ ! -d "$PROJECT_DIR/packages/$pkg/dist" ]; then
+                PACKAGES_NEED_BUILD=1
+                break
+            fi
+        fi
     fi
 done
 
-if [ $PACKAGES_NEED_BUILD -eq 0 ] && [ -d "$PROJECT_DIR/node_modules/.pnpm" ]; then
-    echo "  ✓ Packages appear to be built, skipping build"
+if [ $PACKAGES_NEED_BUILD -eq 0 ]; then
+    echo "  ✓ Packages already built (or don't need building)"
     ((STEPS_SKIPPED++))
 else
     echo "  -> Building packages..."
     cd "$PROJECT_DIR"
-    pnpm run build:packages || {
-        echo -e "${YELLOW}WARNING: Package build had warnings${NC}"
+    pnpm run build:packages 2>&1 | tail -5 || {
+        echo -e "${YELLOW}WARNING: Package build completed with warnings${NC}"
     }
     echo "  ✓ Packages built"
     ((STEPS_COMPLETED++))
