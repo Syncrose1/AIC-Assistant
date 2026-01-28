@@ -80,6 +80,10 @@ uv pip install -e . || {
 if [ -f pyproject.toml.bak ]; then
     mv pyproject.toml.bak pyproject.toml
 fi
+
+# Install missing dependencies not in main package
+uv pip install pytz
+
 echo "  ✓ Dependencies installed"
 echo ""
 
