@@ -38,10 +38,10 @@ pnpm dev:tamagotchi
 
 - **Git** with upstream support
 
-### Optional (Recommended)
+### Optional
 
 - **CUDA** 12.0+ (for GPU acceleration)
-- **speaches** (for TTS/ASR - temporary solution)
+- **speaches** (for TTS/ASR - see Optional Services below)
 
 ## Detailed Setup
 
@@ -64,7 +64,11 @@ This will:
 1. ✅ Check prerequisites (pnpm, node)
 2. ✅ Install dependencies (`pnpm install`)
 3. ✅ Build packages (`pnpm run build:packages`)
-4. ✅ Setup ML Backend service (create venv, install Python deps)
+4. ✅ Setup **syn-ml-backend** service (create venv, install Python deps)
+
+**What's installed:**
+- ✅ syn-ml-backend (ML Backend for emotion detection) - **Required**
+- ❌ syn-speaches (TTS/ASR) - **Optional, NOT installed automatically**
 
 **Expected output:**
 ```
@@ -96,7 +100,22 @@ Start the ML Backend and optionally Speaches:
 ./services/launch-services.sh
 ```
 
-**Expected output:**
+**Expected output (without Speaches):**
+```
+AI Assistant Service Launcher
+==============================
+
+Starting ML Backend (emotion + BFA)...
+✓ ML Backend ready on port 8001
+
+Starting Speaches (TTS + ASR)...
+✗ Speaches directory not found at /path/to/AIC-Assistant/services/syn-speaches
+Please clone and setup speaches first
+```
+
+**This is OK!** Speaches is optional. The ML Backend (required) is running.
+
+**Expected output (with Speaches installed):**
 ```
 AI Assistant Service Launcher
 ==============================
@@ -108,19 +127,7 @@ Starting Speaches (TTS + ASR)...
 ✓ Speaches ready on port 8000
 
 ✓ All services started successfully!
-
-AI Assistant Service Status
-===========================
-
-ML Backend (emotion + BFA) : ✓ Running on port 8001
-Speaches (TTS + ASR)       : ✓ Running on port 8000
-
-Access URLs:
-  ML Backend API: http://localhost:8001
-  Speaches API:   http://localhost:8000
 ```
-
-**Note:** If Speaches is not installed, it will be skipped gracefully.
 
 ### Step 4: Run the Application
 
@@ -135,6 +142,41 @@ The app will open in a desktop window. You should see:
 - `[SYN] Starting external services...` in console
 - `[SYN] ✓ ML Backend ready on port 8001`
 - `[SYN] ✓ All services started successfully`
+
+## Optional Services
+
+### syn-speaches (TTS/ASR)
+
+**syn-speaches is OPTIONAL and NOT installed by default.**
+
+**What is it?**
+- Text-to-Speech (Kokoro TTS)
+- Automatic Speech Recognition (Whisper)
+- **Status:** Temporary solution, will be replaced with internal TTS in Phase 5
+
+**Do you need it?**
+- ✅ **Yes:** If you want local TTS/ASR instead of cloud APIs
+- ❌ **No:** If you're using ElevenLabs, Azure, or other cloud TTS providers
+
+**The app works perfectly without it** - you'll just use cloud TTS providers instead.
+
+**To install (optional):**
+```bash
+cd /path/to/AIC-Assistant/services
+
+# Clone speaches
+git clone https://github.com/speaches-ai/speaches.git syn-speaches
+cd syn-speaches
+
+# Follow speaches setup instructions
+# (usually involves Docker or Python venv setup)
+```
+
+**After installing:**
+```bash
+# Now launch-services.sh will start both
+./services/launch-services.sh
+```
 
 ## Verification
 
