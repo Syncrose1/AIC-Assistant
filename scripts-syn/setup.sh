@@ -151,38 +151,28 @@ else
         }
         
         if [ -d "$SPEACHES_DIR" ]; then
-echo ""
-echo -e "${GREEN}=== Setup Complete ===${NC}"
-echo ""
-if [ $STEPS_COMPLETED -gt 0 ]; then
-    echo "Actions completed: $STEPS_COMPLETED"
-fi
-if [ $STEPS_SKIPPED -gt 0 ]; then
-    echo "Already installed (skipped): $STEPS_SKIPPED"
-fi
-echo ""
-echo "Next step: Run the app"
-echo "  pnpm dev:tamagotchi"
-echo ""
-echo "Services will auto-start when the app launches!"
-echo ""
-echo "Documentation:"
-echo "  - SYN Conventions: docs-syn/SYN_CONVENTIONS.md"
-echo "  - Project Status:  docs-syn/PROJECT_STATUS.md"
-echo ""
-            echo "  IMPORTANT: Speaches requires additional setup:"
-            echo "    1. cd $SPEACHES_DIR"
-            echo "    2. Follow the setup instructions in the speaches README"
-            echo "    3. Typically involves: docker compose up -d or Python venv setup"
             echo ""
-            echo "  After setup, run the app: pnpm dev:tamagotchi"
-            echo "  (services will auto-start)"
+            echo -e "${GREEN}✓ Speaches cloned successfully${NC}"
+            echo ""
+            
+            # Automatically run setup-speaches.sh
+            echo "  -> Setting up Speaches dependencies (this may take 5-10 minutes)..."
+            if [ -f "$SCRIPT_DIR/setup-speaches.sh" ]; then
+                "$SCRIPT_DIR/setup-speaches.sh" || {
+                    echo -e "${YELLOW}WARNING: Speaches setup had some issues${NC}"
+                    echo "  You can retry manually with: ./scripts-syn/setup-speaches.sh"
+                }
+            else
+                echo -e "${YELLOW}WARNING: setup-speaches.sh not found${NC}"
+                echo "  Please run manually: ./scripts-syn/setup-speaches.sh"
+            fi
             increment_completed
         fi
     else
         echo "  -> Skipping Speaches installation"
         echo "  -> You can install later if needed:"
         echo "     cd services && git clone https://github.com/speaches-ai/speaches.git syn-speaches"
+        echo "     ./scripts-syn/setup-speaches.sh"
     fi
 fi
 echo ""
