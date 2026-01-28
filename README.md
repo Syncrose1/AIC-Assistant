@@ -403,6 +403,55 @@ flowchart TD
 - [mallorbc/whisper_mic](https://github.com/mallorbc/whisper_mic)
 - [`xsai`](https://github.com/moeru-ai/xsai): Implemented a decent amount of packages to interact with LLMs and models, like [Vercel AI SDK](https://sdk.vercel.ai/) but way small.
 
+## [SYN] Custom Code
+
+This fork contains custom enhancements to AIRI, identified by the **SYN** prefix (Syncrose1/AIC-Assistant).
+
+### SYN Convention
+
+All custom components use SYN prefix to distinguish from upstream AIRI code:
+- **Directories:** `docs-syn/`, `scripts-syn/`, `services/syn-*/`
+- **Classes:** `SYNServiceManager`
+- **Log Tags:** `[SYN]` in console output
+- **Git Commits:** `[SYN]` prefix in commit messages
+
+This ensures clean upstream syncs and clear ownership of code.
+
+### Custom Components
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| **syn-ml-backend** | `services/syn-ml-backend/` | ML inference service (emotion detection, BFA) |
+| **SYNServiceManager** | `apps/stage-tamagotchi/src/main/syn-service-manager.ts` | Auto-starts services on app launch |
+| **Custom Packages** | `packages/*` | VBridger lip-sync, emotion detection, phoneme timing |
+| **Documentation** | `docs-syn/` | Testing guides, architecture docs |
+| **Scripts** | `scripts-syn/` | Install, update, and utility scripts |
+
+### Documentation
+
+All custom documentation is in `docs-syn/`:
+- [SYN_CONVENTIONS.md](./docs-syn/SYN_CONVENTIONS.md) - Architecture & naming conventions
+- [PROJECT_STATUS.md](./docs-syn/PROJECT_STATUS.md) - Current status & roadmap
+- [TESTING_VBRIDGER.md](./docs-syn/TESTING_VBRIDGER.md) - VBridger lip-sync testing
+- [TESTING_EMOTIONS.md](./docs-syn/TESTING_EMOTIONS.md) - Emotion system testing
+
+### Upstream Compatibility
+
+The SYN convention ensures zero conflicts when syncing with upstream AIRI:
+```bash
+# Fetch upstream changes
+git fetch upstream
+git merge upstream/main
+# No conflicts - our code is in SYN-prefixed locations
+```
+
+### Current Status
+
+**Phase 2:** ✅ VBridger Lip-Sync - COMPLETE  
+**Phase 3:** 🔄 Emotion Visual System - IN PROGRESS
+
+See [docs-syn/PROJECT_STATUS.md](./docs-syn/PROJECT_STATUS.md) for detailed status.
+
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=moeru-ai/airi&type=Date)](https://www.star-history.com/#moeru-ai/airi&Date)
