@@ -25,6 +25,7 @@ import { setupMainWindow } from './windows/main'
 import { setupNoticeWindowManager } from './windows/notice'
 import { setupSettingsWindowReusableFunc } from './windows/settings'
 import { setupWidgetsWindowManager } from './windows/widgets'
+import { synServiceManager } from './syn-service-manager'
 
 // TODO: once we refactored eventa to support window-namespaced contexts,
 // we can remove the setMaxListeners call below since eventa will be able to dispatch and
@@ -69,8 +70,38 @@ electronApp.setAppUserModelId('ai.moeru.airi')
 
 initScreenCaptureForMain()
 
+// [SYN] Service Manager: Start ML Backend and Speaches on app launch (gracefully handles missing mods)
+let servicesStarted = false
+async function startServices() {
+  if (servicesStarted) return
+  servicesStarted = true
+
+  // Check if service manager has any services configured (graceful degradation)
+  if (!synServiceManager.hasServices()) {
+    log.log('[SYN] No custom services found - running base AIRI')
+    return
+  }
+
+  log.log('Starting external services...')
+  const statuses = await synServiceManager.startAll()
+
+  // Only log warnings if services were configured but failed to start
+  if (statuses.length > 0) {
+    const allRunning = statuses.every(s => s.running)
+    if (allRunning) {
+      log.log('✓ All services started successfully')
+    } else {
+      log.warn('Some services failed to start:', statuses.filter(s => !s.running).map(s => s.name))
+      log.warn('Continuing with base AIRI functionality')
+    }
+  }
+}
+
 app.whenReady().then(async () => {
   injeca.setLogger(createLoggLogger(useLogg('injeca').useGlobalConfig()))
+
+  // Start external services first
+  await startServices()
 
   const serverChannel = injeca.provide('modules:channel-server', () => setupServerChannel())
   const autoUpdater = injeca.provide('services:auto-updater', () => setupAutoUpdater())
@@ -146,4 +177,10 @@ app.on('window-all-closed', () => {
 app.on('before-quit', async () => {
   emitAppBeforeQuit()
   injeca.stop()
+
+  // Stop external services
+  if (synServiceManager.hasServices()) {
+    log.log('Stopping external services...')
+    await synServiceManager.stopAll()
+  }
 })

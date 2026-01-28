@@ -1,0 +1,31 @@
+{
+  "name": "@airi-mods/phoneme-timing",
+  "version": "0.1.0",
+  "description": "TTS-agnostic phoneme timing system for VBridger lip-sync",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@airi-mods/animation-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0"
+  },
+  "keywords": [
+    "phoneme",
+    "timing",
+    "tts",
+    "lipsync",
+    "vbridger",
+    "espeak",
+    "mfa"
+  ],
+  "author": "",
+  "license": "MIT"
+}

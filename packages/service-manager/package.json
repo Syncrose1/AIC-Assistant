@@ -1,0 +1,22 @@
+{
+  "name": "@airi-mods/service-manager",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Service manager for ML Backend and Speaches integration",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  }
+}
