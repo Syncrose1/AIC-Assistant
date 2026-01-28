@@ -22,6 +22,15 @@ echo ""
 STEPS_COMPLETED=0
 STEPS_SKIPPED=0
 
+# Helper function to increment counters without triggering set -e
+increment_completed() {
+    STEPS_COMPLETED=$((STEPS_COMPLETED + 1))
+}
+
+increment_skipped() {
+    STEPS_SKIPPED=$((STEPS_SKIPPED + 1))
+}
+
 # Step 1: Check prerequisites
 echo -e "${BLUE}[1/5]${NC} Checking prerequisites..."
 if ! command -v pnpm &> /dev/null; then
@@ -36,7 +45,7 @@ echo ""
 echo -e "${BLUE}[2/5]${NC} Checking Node dependencies..."
 if [ -d "$PROJECT_DIR/node_modules" ]; then
     echo "  ✓ node_modules already exists, skipping pnpm install"
-    ((STEPS_SKIPPED++))
+    increment_skipped
 else
     echo "  -> Installing dependencies..."
     cd "$PROJECT_DIR"
@@ -45,7 +54,7 @@ else
         pnpm install --ignore-scripts
     }
     echo "  ✓ Dependencies installed"
-    ((STEPS_COMPLETED++))
+    increment_completed
 fi
 echo ""
 
@@ -68,7 +77,7 @@ done
 
 if [ $PACKAGES_NEED_BUILD -eq 0 ]; then
     echo "  ✓ Packages already built (or don't need building)"
-    ((STEPS_SKIPPED++))
+    increment_skipped
 else
     echo "  -> Building packages..."
     cd "$PROJECT_DIR"
@@ -76,7 +85,7 @@ else
         echo -e "${YELLOW}WARNING: Package build completed with warnings${NC}"
     }
     echo "  ✓ Packages built"
-    ((STEPS_COMPLETED++))
+    increment_completed
 fi
 echo ""
 
@@ -99,7 +108,7 @@ else
     
     if [ $VENV_OK -eq 1 ]; then
         echo "  ✓ ML Backend virtual environment already set up with dependencies"
-        ((STEPS_SKIPPED++))
+        increment_skipped
     else
         if [ -f "$ML_BACKEND_DIR/scripts/install.sh" ]; then
             echo "  -> Setting up ML Backend (this may take 5-10 minutes)..."
@@ -108,7 +117,7 @@ else
                 echo "  You can manually run: cd $ML_BACKEND_DIR && bash scripts/install.sh"
             }
             echo "  ✓ ML Backend setup complete"
-            ((STEPS_COMPLETED++))
+            increment_completed
         else
             echo -e "${YELLOW}  -> ML Backend install script not found${NC}"
         fi
@@ -123,7 +132,7 @@ SPEACHES_DIR="$PROJECT_DIR/services/syn-speaches"
 if [ -d "$SPEACHES_DIR" ]; then
     echo "  ✓ Speaches already installed at $SPEACHES_DIR"
     echo "  -> If you need to reconfigure speaches, cd $SPEACHES_DIR and follow its README"
-    ((STEPS_SKIPPED++))
+    increment_skipped
 else
     echo ""
     echo "Speaches provides local Text-to-Speech and Speech Recognition."
@@ -142,16 +151,35 @@ else
         }
         
         if [ -d "$SPEACHES_DIR" ]; then
-            echo ""
-            echo -e "${GREEN}✓ Speaches cloned successfully${NC}"
-            echo ""
+echo ""
+echo -e "${GREEN}=== Setup Complete ===${NC}"
+echo ""
+if [ $STEPS_COMPLETED -gt 0 ]; then
+    echo "Actions completed: $STEPS_COMPLETED"
+fi
+if [ $STEPS_SKIPPED -gt 0 ]; then
+    echo "Already installed (skipped): $STEPS_SKIPPED"
+fi
+echo ""
+echo "Next step: Run the app"
+echo "  pnpm dev:tamagotchi"
+echo ""
+echo "Services will auto-start when the app launches!"
+echo ""
+echo "Optional: Check service status before running app:"
+echo "  ./scripts-syn/launch-services.sh --status"
+echo ""
+echo "Documentation:"
+echo "  - SYN Conventions: docs-syn/SYN_CONVENTIONS.md"
+echo "  - Project Status:  docs-syn/PROJECT_STATUS.md"
+echo ""
             echo "  IMPORTANT: Speaches requires additional setup:"
             echo "    1. cd $SPEACHES_DIR"
             echo "    2. Follow the setup instructions in the speaches README"
             echo "    3. Typically involves: docker compose up -d or Python venv setup"
             echo ""
             echo "  After setup, both services will start with: ./services/launch-services.sh"
-            ((STEPS_COMPLETED++))
+            increment_completed
         fi
     else
         echo "  -> Skipping Speaches installation"
