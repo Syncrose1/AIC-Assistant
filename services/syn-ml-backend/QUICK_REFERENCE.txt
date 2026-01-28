@@ -1,0 +1,146 @@
+# ML Backend Service - Quick Reference Card
+# Print this and keep it handy when debugging
+
+========================================
+SERVICE HEALTH CHECK
+========================================
+
+Quick Health:
+  curl http://127.0.0.1:8000/health
+
+Full Diagnostic:
+  python scripts/test_service.py
+
+Specific Tests:
+  python scripts/test_service.py --test health
+  python scripts/test_service.py --test emotion
+  python scripts/test_service.py --test performance
+
+Automated Run:
+  bash scripts/run_tests.sh
+
+========================================
+SERVICE CONTROL
+========================================
+
+Start Service:
+  ./launcher.py
+
+Stop Service:
+  lsof -i :8000
+  kill <PID>
+
+Check if Running:
+  lsof -i :8000
+  curl http://127.0.0.1:8000/health
+
+========================================
+API ENDPOINTS
+========================================
+
+Health:
+  GET  /health
+
+Emotion Detection:
+  POST /emotion/detect
+  Body: {"text": "I am happy!"}
+
+Phoneme Alignment:
+  POST /align/phonemes
+  Body: {"text": "hello", "audio_path": "/path/to/audio.wav"}
+
+========================================
+TESTING COMMANDS
+========================================
+
+# Emotion test
+curl -X POST http://127.0.0.1:8000/emotion/detect \
+  -H "Content-Type: application/json" \
+  -d '{"text": "I am so happy today!"}'
+
+# Expected result: emotion = "joy"
+
+# Health test
+curl http://127.0.0.1:8000/health
+
+# Expected result: status = "healthy"
+
+========================================
+PERFORMANCE THRESHOLDS
+========================================
+
+Emotion Detection: <100ms (expected ~25ms)
+Health Check:      <50ms  (expected ~5ms)
+Error Rate:        <5%    (expected ~0%)
+Memory Increase:   <2GB   (expected ~500MB)
+
+========================================
+COMMON ISSUES
+========================================
+
+❌ "Cannot connect"
+   → Service not running
+   → Fix: ./launcher.py
+
+❌ "CUDA not available"
+   → Check: nvidia-smi
+   → Fix: Install NVIDIA drivers
+
+❌ "High latency"
+   → First run (model loading)
+   → Fix: Wait, re-run test
+
+❌ "Import errors"
+   → Venv not activated
+   → Fix: bash scripts/install.sh
+
+❌ "espeak not found"
+   → System dependency missing
+   → Fix: sudo pacman -S espeak-ng
+
+========================================
+KEY FILES
+========================================
+
+Test Suite:
+  tests/README.md
+  scripts/test_service.py
+  scripts/run_tests.sh
+
+Service Code:
+  src/main.py
+  launcher.py
+
+Documentation:
+  README.md
+  ../../docs/MASTER_CONTEXT.md
+
+========================================
+DEBUGGING WORKFLOW
+========================================
+
+1. Run tests
+   python scripts/test_service.py
+
+2. Check results
+   ✓ ALL PASSED → Service OK
+   ✗ FAILED    → Check errors
+
+3. If failed:
+   - Read error message
+   - Check service logs: ./launcher.py
+   - Fix issue
+   - Re-run tests
+   - Repeat until pass
+
+4. Only commit when tests pass!
+
+========================================
+EMERGENCY CONTACT
+========================================
+
+GitHub: Syncrose1/AI-Assistant-Project
+Branch: dev
+Last Updated: 2026-01-28
+
+========================================

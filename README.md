@@ -12,7 +12,19 @@
   <img width="250" src="./docs/content/public/banner-light-1280x640.avif" />
 </picture>
 
-<h1 align="center">Project AIRI</h1>
+<h1 align="center">AIC-Assistant (AI Companion)</h1>
+
+<p align="center"><strong>A customized fork of AIRI</strong> with ML-based emotion detection and VBridger lip-sync</p>
+
+<p align="center">
+  <a href="#aic-features">Features</a> •
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#syn-custom-code">[SYN] Custom Code</a>
+</p>
+
+---
+
+<h2 align="center">Project AIRI</h2>
 
 <p align="center">Re-creating Neuro-sama, a soul container of AI waifu / virtual characters to bring them into our world.</p>
 

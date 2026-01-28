@@ -1,0 +1,21 @@
+#
+# Tauri Configuration for ML Backend Service
+# 
+# Add this to your tauri.conf.json:
+#
+# "beforeBuildCommand": "pnpm build",
+# "beforeDevCommand": "pnpm dev",
+# "bundle": {
+#   "externalBin": [
+#     "ml-backend"
+#   ]
+# }
+#
+# The service will be packaged as a sidecar binary
+#
+
+[[bin]]
+name = "ml-backend-launcher"
+path = "src/ml_backend_launcher.rs"
+
+# Or use tauri.conf.json externalBin to bundle the Python launcher

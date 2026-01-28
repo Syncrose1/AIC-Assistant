@@ -1,0 +1,30 @@
+# AI Assistant ML Backend Service
+# Provides ML inference for emotion detection and phoneme alignment
+
+# FastAPI and server
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+python-multipart==0.0.17
+
+# ML / Transformers
+torch==2.6.0
+torchaudio==2.6.0
+transformers==4.48.0
+accelerate==1.2.1
+
+# Bournemouth Forced Aligner
+bournemouth-forced-aligner==0.1.7
+
+# Audio processing
+librosa==0.10.2
+soundfile==0.12.1
+
+# Utilities
+numpy==1.26.4
+pydantic==2.10.0
+python-dotenv==1.0.1
+
+# Development
+pytest==8.3.4
+pytest-asyncio==0.25.0
+httpx==0.28.0

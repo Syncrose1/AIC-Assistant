@@ -46,10 +46,10 @@ class SYNServiceManager {
 
   constructor() {
     // Check if services are available
-    const projectDir = join(__dirname, '../../../../../..')
+    const projectDir = join(__dirname, '../../../../..')
     
     // ML Backend configuration
-    const mlBackendDir = join(projectDir, 'airi-mods/services/ml-backend')
+    const mlBackendDir = join(projectDir, 'services/syn-ml-backend')
     if (existsSync(mlBackendDir)) {
       this.configs.set('ml-backend', {
         name: 'ML Backend',
@@ -67,7 +67,7 @@ class SYNServiceManager {
     }
 
     // Speaches configuration
-    const speachesDir = join(projectDir, 'speaches-server')
+    const speachesDir = join(projectDir, 'services/syn-speaches')
     if (existsSync(speachesDir)) {
       this.configs.set('speaches', {
         name: 'Speaches TTS/ASR',
@@ -255,4 +255,4 @@ class SYNServiceManager {
 }
 
 export const synServiceManager = new SYNServiceManager()
-export default serviceManager
+export default synServiceManager
