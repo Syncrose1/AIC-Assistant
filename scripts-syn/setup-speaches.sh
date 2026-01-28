@@ -115,6 +115,26 @@ else
 fi
 echo ""
 
+# Model download prompt
+echo -e "${BLUE}[Optional]${NC} TTS/ASR Models"
+echo "Speaches requires models for TTS (Text-to-Speech)."
+echo "Models can be downloaded via the web UI or API after starting."
+echo ""
+echo "Example curl commands to download models:"
+echo ""
+echo "1. Kokoro TTS model (~350MB):"
+echo "   curl -X POST http://localhost:8000/v1/models \\"
+echo "     -H 'Content-Type: application/json' \\"
+echo "     -d '{\"model\": \"speaches-ai/Kokoro-82M-v1.0-ONNX-fp16\"}'"
+echo ""
+echo "2. Whisper STT model (~1.5GB):"
+echo "   curl -X POST http://localhost:8000/v1/models \\"
+echo "     -H 'Content-Type: application/json' \\"
+echo "     -d '{\"model\": \"openai/whisper-large-v3\"}'"
+echo ""
+echo "Or visit http://localhost:8000/ after starting speaches to use the web UI."
+echo ""
+
 # Summary
 echo -e "${GREEN}=== Speaches Setup Complete ===${NC}"
 echo ""
