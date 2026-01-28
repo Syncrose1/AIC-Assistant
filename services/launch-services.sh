@@ -78,8 +78,9 @@ start_ml_backend() {
     python launcher.py &
     ML_PID=$!
     
-    # Wait for service to be ready
-    for i in {1..30}; do
+    # Wait for service to be ready (up to 60 seconds for model loading)
+    echo "  -> Waiting for ML Backend to initialize (this may take 30-60 seconds)..."
+    for i in {1..60}; do
         if check_service $ML_PORT; then
             echo -e "${GREEN}✓ ML Backend ready on port $ML_PORT${NC}"
             echo $ML_PID >> "$PIDS_FILE"
@@ -120,8 +121,9 @@ start_speaches() {
       .venv/bin/uvicorn --factory --host 0.0.0.0 --port $SPEACHES_PORT speaches.main:create_app &
     SPEACHES_PID=$!
     
-    # Wait for service to be ready
-    for i in {1..30}; do
+    # Wait for service to be ready (up to 45 seconds for first startup)
+    echo "  -> Waiting for Speaches to initialize..."
+    for i in {1..45}; do
         if check_service $SPEACHES_PORT; then
             echo -e "${GREEN}✓ Speaches ready on port $SPEACHES_PORT${NC}"
             echo $SPEACHES_PID >> "$PIDS_FILE"
