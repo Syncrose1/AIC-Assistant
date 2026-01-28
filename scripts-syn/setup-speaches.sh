@@ -91,25 +91,13 @@ uv pip install "gradio>=5.49.1,<6.0.0"
 echo "  ✓ Dependencies installed"
 echo ""
 
-# Fix missing Silero VAD v5 models (required for STT)
-echo "  -> Checking Silero VAD models..."
-FASTER_WHISPER_ASSETS="$SPEACHES_DIR/.venv/lib/python3.12/site-packages/faster_whisper/assets"
-if [ -d "$FASTER_WHISPER_ASSETS" ]; then
-    # Check if v5 models exist, if not create symlinks to v6
-    if [ ! -f "$FASTER_WHISPER_ASSETS/silero_encoder_v5.onnx" ]; then
-        if [ -f "$FASTER_WHISPER_ASSETS/silero_vad_v6.onnx" ]; then
-            echo "    Creating symlinks for Silero VAD v5 models..."
-            ln -sf silero_vad_v6.onnx "$FASTER_WHISPER_ASSETS/silero_encoder_v5.onnx"
-            ln -sf silero_vad_v6.onnx "$FASTER_WHISPER_ASSETS/silero_decoder_v5.onnx"
-            echo "    ✓ Silero VAD models fixed"
-        else
-            echo "    ${YELLOW}WARNING: Silero VAD models not found. STT may not work.${NC}"
-        fi
-    else
-        echo "    ✓ Silero VAD models already present"
-    fi
-fi
+# Note: Silero VAD models are handled by browser-based VAD in AIRI
+# Speaches TTS/STT will work without local VAD models
+echo "  -> Note: VAD is handled by browser-based implementation in AIRI"
+echo "    Speaches TTS/STT will use AIRI's native VAD (onnx-community/silero-vad)"
 echo ""
+
+# Check system dependencies
 
 # Check system dependencies
 echo -e "${BLUE}[4/4]${NC} Checking system dependencies..."
