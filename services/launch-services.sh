@@ -75,7 +75,7 @@ start_ml_backend() {
     fi
     
     source venv/bin/activate
-    python src/main.py &
+    python launcher.py &
     ML_PID=$!
     
     # Wait for service to be ready
