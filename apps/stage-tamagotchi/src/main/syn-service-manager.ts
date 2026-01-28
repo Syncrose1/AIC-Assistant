@@ -48,7 +48,9 @@ class SYNServiceManager {
 
   constructor() {
     // Check if services are available
-    const projectDir = join(__dirname, '../../../../..')
+    // __dirname is 'apps/stage-tamagotchi/out/main/' in compiled app
+    // Need 4 levels up to reach project root: out/ -> stage-tamagotchi/ -> apps/ -> root
+    const projectDir = join(__dirname, '../../../../')
 
     // ML Backend configuration
     const mlBackendDir = join(projectDir, 'services/syn-ml-backend')
@@ -108,17 +110,22 @@ class SYNServiceManager {
     }
   }
 
-  private async waitForService(port: number, maxAttempts = 30): Promise<boolean> {
+  private async waitForService(port: number, maxAttempts = 30, serviceName = 'Service'): Promise<boolean> {
+    console.log(`[SYN] ${serviceName}: Waiting up to ${maxAttempts} seconds to start...`)
     for (let i = 0; i < maxAttempts; i++) {
       if (await this.isServiceRunning(port)) {
         return true
+      }
+      // Log progress every 30 seconds for long-running services
+      if ((i + 1) % 30 === 0) {
+        console.log(`[SYN] ${serviceName}: Still starting... (${i + 1}/${maxAttempts} seconds)`)
       }
       await new Promise(resolve => setTimeout(resolve, 1000))
     }
     return false
   }
 
-  async startService(serviceId: string): Promise<ServiceStatus> {
+  async startService(serviceId: string, maxWaitSeconds = 30): Promise<ServiceStatus> {
     const config = this.configs.get(serviceId)
     if (!config) {
       return { name: serviceId, running: false, port: 0, error: 'Unknown service' }
@@ -149,11 +156,29 @@ class SYNServiceManager {
       })
 
       child.stdout?.on('data', (data) => {
-        console.log(`[${config.name}] ${data.toString().trim()}`)
+        try {
+          console.log(`[${config.name}] ${data.toString().trim()}`)
+        }
+        catch (e) {
+          // Ignore EPIPE errors when child process closes
+        }
+      })
+
+      child.stdout?.on('error', () => {
+        // Ignore pipe errors
       })
 
       child.stderr?.on('data', (data) => {
-        console.error(`[${config.name}] ${data.toString().trim()}`)
+        try {
+          console.error(`[${config.name}] ${data.toString().trim()}`)
+        }
+        catch (e) {
+          // Ignore EPIPE errors when child process closes
+        }
+      })
+
+      child.stderr?.on('error', () => {
+        // Ignore pipe errors
       })
 
       child.on('error', (error) => {
@@ -167,16 +192,16 @@ class SYNServiceManager {
 
       this.services.set(serviceId, child)
 
-      const isReady = await this.waitForService(config.port)
+      const isReady = await this.waitForService(config.port, maxWaitSeconds, config.name)
 
       if (isReady) {
         console.log(`[SYN] ✓ ${config.name} is ready on port ${config.port}`)
         return { name: config.name, running: true, pid: child.pid, port: config.port }
       }
       else {
-        console.error(`[SYN] ✗ ${config.name} failed to start`)
+        console.error(`[SYN] ✗ ${config.name} failed to start (timeout after ${maxWaitSeconds}s)`)
         child.kill()
-        return { name: config.name, running: false, port: config.port, error: 'Timeout waiting for service' }
+        return { name: config.name, running: false, port: config.port, error: `Timeout waiting for service after ${maxWaitSeconds}s` }
       }
     }
     catch (error) {
@@ -209,16 +234,39 @@ class SYNServiceManager {
       return []
     }
 
-    console.log('[SYN] Starting all services...')
+    console.log('[SYN] Starting all services (app will continue while services initialize)...')
 
     const results: ServiceStatus[] = []
 
+    // Start ML Backend with extended timeout (600s = 10 minutes for model loading)
+    // This runs asynchronously - app continues while model loads
     if (this.configs.has('ml-backend')) {
-      results.push(await this.startService('ml-backend'))
+      console.log('[SYN] ML Backend: Starting with 600 second timeout (model loading may take several minutes)...')
+      // Start ML Backend asynchronously so app doesn't block
+      this.startService('ml-backend', 600).then((status) => {
+        if (status.running) {
+          console.log('[SYN] ✓ ML Backend is now ready (started in background)')
+        }
+        else {
+          console.error('[SYN] ✗ ML Backend failed to start:', status.error)
+        }
+      }).catch((err) => {
+        console.error('[SYN] ML Backend error:', err)
+      })
+
+      // Add pending status - will update asynchronously
+      const mlConfig = this.configs.get('ml-backend')!
+      results.push({
+        name: mlConfig.name,
+        running: false,
+        port: mlConfig.port,
+        error: 'Starting in background (may take 1-10 minutes for model loading)',
+      })
     }
 
+    // Start Speaches normally with standard timeout
     if (this.configs.has('speaches')) {
-      results.push(await this.startService('speaches'))
+      results.push(await this.startService('speaches', 60))
     }
 
     const allRunning = results.every(r => r.running)
@@ -226,7 +274,15 @@ class SYNServiceManager {
       console.log('[SYN] ✓ All services started successfully')
     }
     else {
-      console.error('[SYN] ✗ Some services failed to start')
+      const pending = results.filter(r => r.error?.includes('background'))
+      const failed = results.filter(r => !r.running && !r.error?.includes('background'))
+
+      if (pending.length > 0) {
+        console.log(`[SYN] ⏳ ${pending.length} service(s) starting in background (app is ready)`)
+      }
+      if (failed.length > 0) {
+        console.error('[SYN] ✗ Some services failed:', failed.map(r => r.name).join(', '))
+      }
     }
 
     return results
