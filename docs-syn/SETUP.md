@@ -65,25 +65,39 @@ This will:
 2. ✅ Install dependencies (`pnpm install`)
 3. ✅ Build packages (`pnpm run build:packages`)
 4. ✅ Setup **syn-ml-backend** service (create venv, install Python deps)
+5. ✅ Prompt to install **syn-speaches** (TTS/ASR) - **Optional, defaults to YES**
 
 **What's installed:**
 - ✅ syn-ml-backend (ML Backend for emotion detection) - **Required**
-- ❌ syn-speaches (TTS/ASR) - **Optional, NOT installed automatically**
+- ✅ syn-speaches (TTS/ASR) - **Optional, defaults to YES**
 
 **Expected output:**
 ```
 === AIC-Assistant Setup ===
 Project directory: /path/to/AIC-Assistant
 
-[1/4] Checking prerequisites...
+[1/5] Checking prerequisites...
   ✓ pnpm found
-[2/4] Installing dependencies...
+[2/5] Installing dependencies...
   ✓ Dependencies installed
-[3/4] Building packages...
+[3/5] Building packages...
   ✓ Packages built
-[4/4] Setting up SYN ML Backend Service...
+[4/5] Setting up SYN ML Backend Service...
   -> Running ML Backend install script...
   ✓ ML Backend setup complete
+[5/5] Setting up Speaches (TTS/ASR) Service...
+
+Speaches provides local Text-to-Speech and Speech Recognition.
+This is recommended for the best experience.
+
+Install Speaches? [Y/n] (default: yes): Y
+  -> Cloning Speaches repository...
+  -> Speaches cloned successfully
+
+IMPORTANT: Speaches requires additional setup:
+  1. cd /path/to/AIC-Assistant/services/syn-speaches
+  2. Follow the setup instructions in the speaches README
+  3. Typically involves: docker compose up -d or Python venv setup
 
 === Setup Complete ===
 
@@ -147,7 +161,7 @@ The app will open in a desktop window. You should see:
 
 ### syn-speaches (TTS/ASR)
 
-**syn-speaches is OPTIONAL and NOT installed by default.**
+**syn-speaches is OPTIONAL but prompted during setup (defaults to YES).**
 
 **What is it?**
 - Text-to-Speech (Kokoro TTS)
@@ -160,7 +174,12 @@ The app will open in a desktop window. You should see:
 
 **The app works perfectly without it** - you'll just use cloud TTS providers instead.
 
-**To install (optional):**
+**During setup:**
+The setup script will ask: `Install Speaches? [Y/n] (default: yes)`
+- Press **Enter** or type **Y** → Clones speaches repository
+- Type **N** → Skips speaches installation
+
+**Manual installation (if you skipped during setup):**
 ```bash
 cd /path/to/AIC-Assistant/services
 
