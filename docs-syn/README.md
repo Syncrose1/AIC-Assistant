@@ -7,6 +7,7 @@
 ### Essential Reading (Start Here)
 | Document | Purpose | Audience |
 |----------|---------|----------|
+| **[SETUP.md](./SETUP.md)** | Complete setup instructions | New users |
 | **[SYN_CONVENTIONS.md](./SYN_CONVENTIONS.md)** | Architecture & naming conventions | Everyone |
 | **[PROJECT_STATUS.md](./PROJECT_STATUS.md)** | Current status & what's done | New team members |
 | **[ARCHITECTURE.md](./ARCHITECTURE.md)** | Technical architecture overview | Developers |
