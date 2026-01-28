@@ -84,6 +84,10 @@ fi
 # Install missing dependencies not in main package
 uv pip install pytz
 
+# Downgrade Gradio to compatible version (speaches doesn't support Gradio 6.x yet)
+echo "  -> Downgrading Gradio to compatible version..."
+uv pip install "gradio>=5.49.1,<6.0.0"
+
 echo "  ✓ Dependencies installed"
 echo ""
 

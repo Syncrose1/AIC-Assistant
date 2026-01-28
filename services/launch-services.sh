@@ -78,9 +78,9 @@ start_ml_backend() {
     python launcher.py &
     ML_PID=$!
     
-    # Wait for service to be ready (up to 60 seconds for model loading)
-    echo "  -> Waiting for ML Backend to initialize (this may take 30-60 seconds)..."
-    for i in {1..60}; do
+    # Wait for service to be ready (up to 90 seconds for model loading on first startup)
+    echo "  -> Waiting for ML Backend to initialize (this may take 30-90 seconds on first run)..."
+    for i in {1..90}; do
         if check_service $ML_PORT; then
             echo -e "${GREEN}✓ ML Backend ready on port $ML_PORT${NC}"
             echo $ML_PID >> "$PIDS_FILE"
