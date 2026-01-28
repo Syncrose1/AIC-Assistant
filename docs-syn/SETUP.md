@@ -1,6 +1,6 @@
 # AIC-Assistant Setup Guide
 
-**Date:** 2026-01-28  
+**Date:** 2026-01-28
 **Purpose:** Complete setup instructions for the AIC-Assistant fork
 
 ## Quick Start (5 minutes)
@@ -249,6 +249,31 @@ cd services/syn-ml-backend
 pip install -r requirements.txt
 ```
 
+### Issue: "No space left on device" during pip install
+
+**Cause:** The pip cache in `/tmp` or `~/.cache/pip` has filled up.
+
+**Solution:**
+```bash
+# Clean up pip cache
+rm -rf ~/.cache/pip
+rm -rf /tmp/pip-*
+
+# Also clean other caches to free space
+rm -rf ~/.npm
+rm -rf ~/.pnpm-store
+sudo apt-get clean  # Clean apt cache (Ubuntu/Debian)
+
+# Check disk space
+df -h
+
+# Then retry setup
+cd /path/to/AIC-Assistant
+./scripts-syn/setup.sh
+```
+
+**Prevention:** If you encounter this error frequently, you may need to increase your disk space or regularly clean caches.
+
 ### Issue: "Services fail to start - port already in use"
 
 **Solution:**
@@ -378,6 +403,6 @@ If you encounter issues:
 
 ---
 
-**Last Updated:** 2026-01-28  
-**Setup Time:** ~5 minutes automated, ~15 minutes manual  
+**Last Updated:** 2026-01-28
+**Setup Time:** ~5 minutes automated, ~15 minutes manual
 **Next:** See [PROJECT_STATUS.md](./PROJECT_STATUS.md) for what's implemented
