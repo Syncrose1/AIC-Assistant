@@ -26,7 +26,7 @@ import os
 from datetime import datetime
 
 # Test configuration
-BASE_URL = "http://127.0.0.1:8000"
+BASE_URL = "http://127.0.0.1:8001"
 MAX_RETRIES = 30
 RETRY_DELAY = 1  # seconds
 PERFORMANCE_THRESHOLD_MS = 100  # Max acceptable latency for emotion detection

@@ -1,9 +1,9 @@
 /**
  * ML Backend HTTP Client
- * 
+ *
  * Replaces browser-based transformers.js with Python backend service.
- * Communicates via HTTP to localhost:8000
- * 
+ * Communicates via HTTP to localhost:8001
+ *
  * Benefits:
  * - Reliable GPU acceleration (no WebGPU bugs)
  * - Faster inference (~20-50ms vs 800-4000ms)
@@ -11,12 +11,12 @@
  * - Unified service for all ML needs
  */
 
-const ML_BACKEND_URL = 'http://127.0.0.1:8000'
+const ML_BACKEND_URL = 'http://127.0.0.1:8001'
 
 export interface EmotionResult {
   emotion: string
   confidence: number
-  all_emotions: Array<{ label: string; score: number }>
+  all_emotions: Array<{ label: string, score: number }>
   processing_time_ms: number
 }
 
@@ -30,7 +30,7 @@ export interface PhonemeTimestamp {
 
 export interface PhonemeAlignment {
   phonemes: PhonemeTimestamp[]
-  words: Array<{ word: string; start_ms: number; end_ms: number }>
+  words: Array<{ word: string, start_ms: number, end_ms: number }>
   processing_time_ms: number
 }
 
@@ -79,7 +79,7 @@ export async function detectEmotion(text: string): Promise<EmotionResult> {
 
 /**
  * Align phonemes to audio using Bournemouth Forced Aligner (BFA)
- * 
+ *
  * @param text - The text transcript
  * @param audioPath - Path to audio file (temporary, accessible to backend)
  * @returns Precise phoneme timestamps with IPA notation
@@ -116,14 +116,15 @@ export async function waitForService(maxRetries = 30, delayMs = 1000): Promise<v
         console.log('[ML Client] ✓ Service ready')
         return
       }
-    } catch {
+    }
+    catch {
       // Service not ready yet
     }
-    
+
     console.log(`[ML Client] Waiting for service... (${i + 1}/${maxRetries})`)
     await new Promise(resolve => setTimeout(resolve, delayMs))
   }
-  
+
   throw new Error('ML Backend service failed to start')
 }
 
@@ -134,7 +135,8 @@ export async function isServiceAvailable(): Promise<boolean> {
   try {
     await checkHealth()
     return true
-  } catch {
+  }
+  catch {
     return false
   }
 }

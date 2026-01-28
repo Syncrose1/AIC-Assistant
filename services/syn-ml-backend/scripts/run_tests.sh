@@ -40,7 +40,7 @@ if curl -s http://127.0.0.1:8001/health > /dev/null 2>&1; then
     echo "✓ Service is running"
 else
     echo "⚠ Service not running. Starting it now..."
-    python -m uvicorn src.main:app --host 127.0.0.1 --port 8000 &
+    python -m uvicorn src.main:app --host 127.0.0.1 --port 8001 &
     SERVICE_PID=$!
     
     # Wait for service to start
