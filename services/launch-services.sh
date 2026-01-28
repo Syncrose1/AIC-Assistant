@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Unified Service Launcher for AI Assistant
-# 
+#
 # Starts all required services:
 # - ML Backend (emotion + BFA) on port 8001
 # - Speaches (TTS + ASR) on port 8000

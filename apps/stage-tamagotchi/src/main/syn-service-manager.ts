@@ -1,12 +1,12 @@
 /**
  * Service Manager for AIC-Assistant
- * 
+ *
  * Manages external services:
  * - ML Backend (emotion detection + BFA) on port 8001
  * - Speaches (TTS + ASR) on port 8000
- * 
+ *
  * Services auto-start when app launches and auto-kill when it closes.
- * 
+ *
  * Usage:
  *   import { serviceManager } from './service-manager'
  *   await serviceManager.startAll()
@@ -14,10 +14,12 @@
  *   await serviceManager.stopAll()
  */
 
-import { spawn, type ChildProcess } from 'node:child_process'
-import { join, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import type { ChildProcess } from 'node:child_process'
+
+import { spawn } from 'node:child_process'
 import { existsSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -47,7 +49,7 @@ class SYNServiceManager {
   constructor() {
     // Check if services are available
     const projectDir = join(__dirname, '../../../../..')
-    
+
     // ML Backend configuration
     const mlBackendDir = join(projectDir, 'services/syn-ml-backend')
     if (existsSync(mlBackendDir)) {
@@ -60,8 +62,8 @@ class SYNServiceManager {
         healthEndpoint: '/health',
         env: {
           PYTHONUNBUFFERED: '1',
-          ML_BACKEND_PORT: '8001'
-        }
+          ML_BACKEND_PORT: '8001',
+        },
       })
       this.isAvailable = true
     }
@@ -78,8 +80,8 @@ class SYNServiceManager {
         healthEndpoint: '/health',
         env: {
           ALLOW_ORIGINS: '["http://localhost:5173"]',
-          LD_LIBRARY_PATH: '.cuda-compat'
-        }
+          LD_LIBRARY_PATH: '.cuda-compat',
+        },
       })
       this.isAvailable = true
     }
@@ -97,10 +99,11 @@ class SYNServiceManager {
     try {
       const response = await fetch(`http://127.0.0.1:${port}/health`, {
         method: 'GET',
-        signal: AbortSignal.timeout(1000)
+        signal: AbortSignal.timeout(1000),
       })
       return response.ok
-    } catch {
+    }
+    catch {
       return false
     }
   }
@@ -127,11 +130,11 @@ class SYNServiceManager {
     }
 
     if (!existsSync(config.cwd)) {
-      return { 
-        name: config.name, 
-        running: false, 
-        port: config.port, 
-        error: `Directory not found: ${config.cwd}` 
+      return {
+        name: config.name,
+        running: false,
+        port: config.port,
+        error: `Directory not found: ${config.cwd}`,
       }
     }
 
@@ -142,7 +145,7 @@ class SYNServiceManager {
         cwd: config.cwd,
         env: { ...process.env, ...config.env },
         stdio: 'pipe',
-        detached: false
+        detached: false,
       })
 
       child.stdout?.on('data', (data) => {
@@ -165,16 +168,18 @@ class SYNServiceManager {
       this.services.set(serviceId, child)
 
       const isReady = await this.waitForService(config.port)
-      
+
       if (isReady) {
         console.log(`[SYN] ✓ ${config.name} is ready on port ${config.port}`)
         return { name: config.name, running: true, pid: child.pid, port: config.port }
-      } else {
+      }
+      else {
         console.error(`[SYN] ✗ ${config.name} failed to start`)
         child.kill()
         return { name: config.name, running: false, port: config.port, error: 'Timeout waiting for service' }
       }
-    } catch (error) {
+    }
+    catch (error) {
       console.error(`[SYN] Failed to start ${config.name}:`, error)
       return { name: config.name, running: false, port: config.port, error: String(error) }
     }
@@ -185,15 +190,15 @@ class SYNServiceManager {
     if (child) {
       const config = this.configs.get(serviceId)
       console.log(`[SYN] Stopping ${config?.name || serviceId}...`)
-      
+
       child.kill('SIGTERM')
-      
+
       setTimeout(() => {
         if (!child.killed) {
           child.kill('SIGKILL')
         }
       }, 5000)
-      
+
       this.services.delete(serviceId)
     }
   }
@@ -205,40 +210,41 @@ class SYNServiceManager {
     }
 
     console.log('[SYN] Starting all services...')
-    
+
     const results: ServiceStatus[] = []
-    
+
     if (this.configs.has('ml-backend')) {
       results.push(await this.startService('ml-backend'))
     }
-    
+
     if (this.configs.has('speaches')) {
       results.push(await this.startService('speaches'))
     }
-    
+
     const allRunning = results.every(r => r.running)
     if (allRunning) {
       console.log('[SYN] ✓ All services started successfully')
-    } else {
+    }
+    else {
       console.error('[SYN] ✗ Some services failed to start')
     }
-    
+
     return results
   }
 
   async stopAll(): Promise<void> {
     console.log('[SYN] Stopping all services...')
-    
+
     for (const serviceId of this.services.keys()) {
       await this.stopService(serviceId)
     }
-    
+
     console.log('[SYN] ✓ All services stopped')
   }
 
   async getStatus(): Promise<ServiceStatus[]> {
     const statuses: ServiceStatus[] = []
-    
+
     for (const [id, config] of this.configs) {
       const running = await this.isServiceRunning(config.port)
       const child = this.services.get(id)
@@ -246,10 +252,10 @@ class SYNServiceManager {
         name: config.name,
         running,
         pid: child?.pid,
-        port: config.port
+        port: config.port,
       })
     }
-    
+
     return statuses
   }
 }
