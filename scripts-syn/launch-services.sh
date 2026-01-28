@@ -23,8 +23,8 @@ NC='\033[0m' # No Color
 # Directories
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-ML_BACKEND_DIR="$PROJECT_DIR/services/ml-backend"
-SPEACHES_DIR="$(dirname "$PROJECT_DIR")/speaches-server"
+ML_BACKEND_DIR="$PROJECT_DIR/services/syn-ml-backend"
+SPEACHES_DIR="$PROJECT_DIR/services/syn-speaches"
 
 # Ports
 ML_PORT=8001
