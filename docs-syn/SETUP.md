@@ -249,6 +249,25 @@ cd services/syn-ml-backend
 pip install -r requirements.txt
 ```
 
+### Issue: "venv/bin/activate: No such file or directory"
+
+**Cause:** The virtual environment was copied from another location or corrupted. Virtual environments contain absolute paths that break when moved.
+
+**Solution:**
+```bash
+cd /path/to/AIC-Assistant/services/syn-ml-backend
+
+# Remove old venv
+rm -rf venv
+
+# Recreate venv in the correct location
+python3 -m venv venv
+
+# Activate and install dependencies
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
 ### Issue: "No space left on device" during pip install
 
 **Cause:** The pip cache in `/tmp` or `~/.cache/pip` has filled up.
